@@ -1,17 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
-  Paper, Typography, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, TablePagination, Grid, Button, TextField, Select,
-  InputLabel, FormControl, MenuItem, IconButton, Dialog, DialogActions,
-  DialogContent, DialogTitle
-} from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { DatePicker } from '@mui/lab';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
+  Paper,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  Grid,
+  Button,
+  TextField,
+  Select,
+  InputLabel,
+  FormControl,
+  MenuItem,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { DatePicker } from "@mui/lab";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
 
 function OrderManagement() {
   const navigate = useNavigate();
@@ -19,9 +36,9 @@ function OrderManagement() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchName, setSearchName] = useState('');
+  const [searchName, setSearchName] = useState("");
   const [searchDate, setSearchDate] = useState(null);
-  const [status, setStatus] = useState('All');
+  const [status, setStatus] = useState("All");
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [orderToEdit, setOrderToEdit] = useState(null);
@@ -31,14 +48,14 @@ function OrderManagement() {
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const response = await axios.get('/api/orders');
+        const response = await axios.get("/api/orders");
         const fetchedOrders = response.data;
         // Merge the mock orders with the fetched data
         const mockOrders = generateMockOrders(50);
         setOrders([...fetchedOrders, ...mockOrders]);
         setFilteredOrders([...fetchedOrders, ...mockOrders]);
       } catch (error) {
-        console.error('Error fetching orders:', error);
+        console.error("Error fetching orders:", error);
         // If the API fails, show mock data
         const mockOrders = generateMockOrders(50);
         setOrders(mockOrders);
@@ -50,11 +67,11 @@ function OrderManagement() {
 
   // Generate mock data
   const generateMockOrders = (count) => {
-    const statuses = ['Ordered', 'Packed', 'Shipped', 'Delivered'];
-    const paymentMethods = ['Credit Card', 'PayPal', 'Cash'];
+    const statuses = ["Ordered", "Packed", "Shipped", "Delivered"];
+    const paymentMethods = ["Credit Card", "PayPal", "Cash"];
     return Array.from({ length: count }, (_, i) => ({
       orderID: `MOCK${i + 1}`,
-      Date: `2024-11-${String(i % 30 + 1).padStart(2, '0')}`,
+      Date: `2024-11-${String((i % 30) + 1).padStart(2, "0")}`,
       Status: statuses[i % statuses.length],
       CustomerName: `Customer ${i + 1}`,
       Items: `${Math.floor(Math.random() * 10) + 1} items`,
@@ -65,11 +82,14 @@ function OrderManagement() {
 
   // Filter orders based on search criteria
   useEffect(() => {
-    const filtered = orders.filter(order => {
-      const matchesName = order.CustomerName.toLowerCase().includes(searchName.toLowerCase());
-      const matchesDate = !searchDate || order.Date === searchDate.toISOString().slice(0, 10); // Adjust format as needed
-      const matchesStatus = status === 'All' || order.Status === status;
-      
+    const filtered = orders.filter((order) => {
+      const matchesName = order.CustomerName.toLowerCase().includes(
+        searchName.toLowerCase()
+      );
+      const matchesDate =
+        !searchDate || order.Date === searchDate.toISOString().slice(0, 10); // Adjust format as needed
+      const matchesStatus = status === "All" || order.Status === status;
+
       return matchesName && matchesDate && matchesStatus;
     });
     setFilteredOrders(filtered);
@@ -83,14 +103,8 @@ function OrderManagement() {
   };
 
   // Open edit dialog
-  const handleOpenEditDialog = async (orderId) => {
-    try {
-      const response = await axios.get(`/api/orders/${orderId}`);
-      setOrderToEdit(response.data);
-      setOpenEditDialog(true);
-    } catch (error) {
-      console.error('Error fetching order details:', error);
-    }
+  const handleOpenEditDialog = (orderId) => {
+    navigate(`/edit-order/${orderId}`);
   };
 
   // Close edit dialog
@@ -103,11 +117,19 @@ function OrderManagement() {
   const handleSaveEdit = async () => {
     try {
       await axios.put(`/api/orders/${orderToEdit.orderID}`, orderToEdit);
-      setOrders(orders.map(order => order.orderID === orderToEdit.orderID ? orderToEdit : order));
-      setFilteredOrders(filteredOrders.map(order => order.orderID === orderToEdit.orderID ? orderToEdit : order));
+      setOrders(
+        orders.map((order) =>
+          order.orderID === orderToEdit.orderID ? orderToEdit : order
+        )
+      );
+      setFilteredOrders(
+        filteredOrders.map((order) =>
+          order.orderID === orderToEdit.orderID ? orderToEdit : order
+        )
+      );
       handleCloseEditDialog();
     } catch (error) {
-      console.error('Error updating order:', error);
+      console.error("Error updating order:", error);
     }
   };
 
@@ -127,25 +149,48 @@ function OrderManagement() {
   const handleDeleteOrder = async () => {
     try {
       await axios.delete(`/api/orders/${orderToDelete}`);
-      setOrders(orders.filter(order => order.orderID !== orderToDelete));
-      setFilteredOrders(filteredOrders.filter(order => order.orderID !== orderToDelete));
+      setOrders(orders.filter((order) => order.orderID !== orderToDelete));
+      setFilteredOrders(
+        filteredOrders.filter((order) => order.orderID !== orderToDelete)
+      );
       handleCloseDeleteDialog();
     } catch (error) {
-      console.error('Error deleting order:', error);
+      console.error("Error deleting order:", error);
     }
   };
 
   return (
-    <Paper sx={{ padding: 3, backgroundColor: 'white', minHeight: '81vh', marginTop: 2, marginLeft: 2, marginRight: 2, borderRadius: 2, boxShadow: 3 }}>
-      <Grid container alignItems="center" justifyContent="space-between" sx={{ marginBottom: 2, marginTop: 2 }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#9E4BDC' }}>Order Management</Typography>
-        <Button
+    <Paper
+      sx={{
+        padding: 3,
+        backgroundColor: "white",
+        minHeight: "81vh",
+        marginTop: 2,
+        marginLeft: 2,
+        marginRight: 2,
+        borderRadius: 2,
+        boxShadow: 3,
+      }}
+    >
+      <Grid
+        container
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ marginBottom: 2, marginTop: 2 }}
+      >
+        <Typography variant="h4" sx={{ fontWeight: "bold", color: "#9E4BDC" }}>
+          Order Management
+        </Typography>
+        {/* <Button
           variant="contained"
-          sx={{ backgroundColor: '#9E4BDC', '&:hover': { backgroundColor: '#7B3CB8' } }}
-          onClick={() => navigate('/add-order')}
+          sx={{
+            backgroundColor: "#9E4BDC",
+            "&:hover": { backgroundColor: "#7B3CB8" },
+          }}
+          onClick={() => navigate("/add-order")}
         >
           Create Order
-        </Button>
+        </Button> */}
       </Grid>
 
       {/* Search Bars */}
@@ -202,25 +247,31 @@ function OrderManagement() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-              <TableRow key={order.orderID}>
-                <TableCell>{order.orderID}</TableCell>
-                <TableCell>{order.Date}</TableCell>
-                <TableCell>{order.Status}</TableCell>
-                <TableCell>{order.CustomerName}</TableCell>
-                <TableCell>{order.Items}</TableCell>
-                <TableCell>{order.Total}</TableCell>
-                <TableCell>{order.PayMethod}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleOpenEditDialog(order.orderID)}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleOpenDeleteDialog(order.orderID)}>
-                    <DeleteIcon color="error" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {filteredOrders
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((order) => (
+                <TableRow key={order.orderID}>
+                  <TableCell>{order.orderID}</TableCell>
+                  <TableCell>{order.Date}</TableCell>
+                  <TableCell>{order.Status}</TableCell>
+                  <TableCell>{order.CustomerName}</TableCell>
+                  <TableCell>{order.Items}</TableCell>
+                  <TableCell>{order.Total}</TableCell>
+                  <TableCell>{order.PayMethod}</TableCell>
+                  <TableCell>
+                    <IconButton
+                      onClick={() => handleOpenEditDialog(order.orderID)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleOpenDeleteDialog(order.orderID)}
+                    >
+                      <DeleteIcon color="error" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -239,9 +290,7 @@ function OrderManagement() {
       {/* Edit Dialog */}
       <Dialog open={openEditDialog} onClose={handleCloseEditDialog}>
         <DialogTitle>Edit Order</DialogTitle>
-        <DialogContent>
-          {/* Add your edit form fields here */}
-        </DialogContent>
+        <DialogContent>{/* Add your edit form fields here */}</DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEditDialog}>Cancel</Button>
           <Button onClick={handleSaveEdit}>Save</Button>
@@ -256,7 +305,9 @@ function OrderManagement() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
-          <Button onClick={handleDeleteOrder} color="error">Delete</Button>
+          <Button onClick={handleDeleteOrder} color="error">
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     </Paper>
