@@ -11,7 +11,6 @@ import Logout from "./pages/Logout";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import AddCategory from "./pages/AddCategory";
-import EditOrder from "./pages/EditOrder";
 
 function App() {
   return (
@@ -43,7 +42,6 @@ function App() {
               <Route path="/edit-product/:id" element={<EditProduct />} />
               <Route path="/add-category" element={<AddCategory />} />
               <Route path="/orders" element={<OrderManagement />} />
-              <Route path="/edit-order/:orderId" element={<EditOrder />} />
             </Routes>
           </div>
         </div>
